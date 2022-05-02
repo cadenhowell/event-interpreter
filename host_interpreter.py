@@ -1,8 +1,8 @@
 import json
 import re
 
-file = open('gg2013.json/gg2013.json')
-file2 = open('gg2015.json/gg2015.json')
+file = open('data/gg2013.json')
+file2 = open('data/gg2015.json')
 
 data = json.load(file)
 data2 = json.load(file2)
@@ -49,9 +49,10 @@ def find_host(data, num_hosts):
                 name_1 = tl_split[name_index].capitalize() + " " + tl_split[name_index + 1].capitalize()
                 increment_dict_val(host_dict, name_1, 1)
     sorted_host_dict = sorted(host_dict.items(), key=lambda x: x[1], reverse=True)
-    n = 0
+    hosts = []
     for i in range(num_hosts):
-        print(sorted_host_dict[i])
+        hosts.append(sorted_host_dict[i][0])
+    return hosts
 
-find_host(data, 2)
-find_host(data2, 2)
+print(find_host(data, 2))
+print(find_host(data2, 2))
