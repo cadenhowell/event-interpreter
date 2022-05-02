@@ -128,5 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# json data in base directory
+# json data in base directory and data subdirectory
 /*.json
+/data/*.json
