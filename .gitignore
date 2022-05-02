@@ -128,7 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#json data
-gg2013.json/
-gg2015.json/
-
+# json data in base directory
+/*.json
