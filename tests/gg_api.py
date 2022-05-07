@@ -2,14 +2,26 @@
 import json
 import os.path
 import host_interpreter as host
+import nominee_interpreter as nominee
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
 OFFICIAL_AWARDS_1819 = ['best motion picture - drama', 'best motion picture - musical or comedy', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best performance by an actress in a motion picture - musical or comedy', 'best performance by an actor in a motion picture - musical or comedy', 'best performance by an actress in a supporting role in any motion picture', 'best performance by an actor in a supporting role in any motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best motion picture - animated', 'best motion picture - foreign language', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best television series - musical or comedy', 'best television limited series or motion picture made for television', 'best performance by an actress in a limited series or a motion picture made for television', 'best performance by an actor in a limited series or a motion picture made for television', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best performance by an actress in a television series - musical or comedy', 'best performance by an actor in a television series - musical or comedy', 'best performance by an actress in a supporting role in a series, limited series or motion picture made for television', 'best performance by an actor in a supporting role in a series, limited series or motion picture made for television', 'cecil b. demille award']
 
-def get_hosts(data):
+def fetch_data(year):
+    '''Load data to global variable so each function does not need to reload it'''
+    if 'data' not in globals():
+        global data
+        data = {}
+    if year not in data:
+        file = open(os.path.dirname(__file__) + f'/../data/gg{year}.json')
+        data[year] = json.load(file)
+    return data[year]
+
+def get_hosts(year):
     '''Hosts is a list of one or more strings. Do NOT change the name
     of this function or what it returns.'''
-    hosts = host.find_host(data, 2)
+    loaded_data = fetch_data(year)
+    hosts = host.find_host(loaded_data, 2)
     return hosts
 
 def get_awards(year):
@@ -22,7 +34,8 @@ def get_nominees(year):
     '''Nominees is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns.'''
-    # Your code here
+    loaded_data = fetch_data(year)
+    nominees = nominee.find_nominees(loaded_data, OFFICIAL_AWARDS_1315)
     return nominees
 
 def get_winner(year):
@@ -54,13 +67,10 @@ def main():
     and then run gg_api.main(). This is the second thing the TA will
     run when grading. Do NOT change the name of this function or
     what it returns.'''
-    file_2013 = open(os.path.dirname(__file__) + '/../data/gg2013.json')
-    file_2015 = open(os.path.dirname(__file__) + '/../data/gg2015.json')
-    data_2013, data_2015 = json.load(file_2013), json.load(file_2015)
-    hosts_2013, hosts_2015 = get_hosts(data_2013), get_hosts(data_2015)
+    years = ['2013', '2015']
+    for year in years:
+        print(f'{year} hosts: {get_hosts(year)}')
 
-    print(hosts_2013, hosts_2015)
-    # Your code here
     return
 
 if __name__ == '__main__':
