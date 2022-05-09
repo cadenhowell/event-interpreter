@@ -70,6 +70,7 @@ def main():
     years = ['2013', '2015']
     for year in years:
         print(f'{year} hosts: {get_hosts(year)}')
+        print(f'{year} nominees: {get_nominees(year)}')
 
     return
 
