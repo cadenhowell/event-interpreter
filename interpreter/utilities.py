@@ -114,7 +114,6 @@ def awards_to_people_parser(award_ppl_dict):
                 for element in l1:
                     if element[1] != 'NNP':
                         val = val * 0.25
-                        print(name)
                     else:
                         num_nnp += 1
             if num_nnp == 0: continue
@@ -137,7 +136,7 @@ def awards_to_people_parser(award_ppl_dict):
                         val = val * 1.5
             _increment_award_presenter(correct_names_dict, award, found_name, val)
 
-    print(correct_names_dict)
+    #print(correct_names_dict)
     for award, person_dict in correct_names_dict.items():
         max_persons = [None, None]
         max_scores = [0, 0]
@@ -152,7 +151,7 @@ def awards_to_people_parser(award_ppl_dict):
             result_dict[award] = max_persons
         else:
             result_dict[award] =  max_persons#[max_persons[0]]
-    print(result_dict)
+    #print(result_dict)
     return result_dict
         #sort by value
         #check for whether or not word is nltktagged as NNP, not tagged as NNP --> .25x

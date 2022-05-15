@@ -200,5 +200,8 @@ def find_presenters(data, awards_official):
     #for key, item in award_dict.items():
     #    print(key, item)
     result = utilities.awards_to_people_parser(award_dict)
-    presenters = []
-    return presenters
+    return result
+
+# FUTURE IMPROVEMENTS
+# Better parsing of possible names in forward and backward checking with NLTK
+# eliminating winners from consideration
