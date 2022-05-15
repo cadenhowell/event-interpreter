@@ -67,6 +67,18 @@ def imdb_get_similar_people(person, ia):
 
     return ''
 
+def imdb_get_similar_movie(movie, ia):
+    movie = movie.lower()
+    movie_results = ia.search_movie(movie)
+    if movie_results == []: return 0
+    for found_movie in movie_results:
+        return found_movie.get('title').lower()
+    return ''
+
+# will return most similar movie and entity
+def imdb_get_similar_entity(entity, ia):
+    return imdb_get_similar_movie, imdb_get_similar_entity
+
 '''
 print(imdb_check_entity('mel gibson', ia, 2014))
 print(imdb_check_movie('Cheaper by the Dozen', ia, 2023))
