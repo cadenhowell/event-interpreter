@@ -127,6 +127,14 @@ def awards_to_people_parser(award_ppl_dict):
                 found_list = new_found_list
                 found_name = " ".join(new_found_list)
             
+            # if good length for name, increase weight
+            name_list = name.split(" ")
+            if len(found_list) == len(name_list):
+                if len(found_list) == 2:
+                    val = val * 5
+                    if found_list == name_list:
+                        val = val * 5
+
             if found_name == name:
                 if len(found_name) > 1:
                     val = val * 5
