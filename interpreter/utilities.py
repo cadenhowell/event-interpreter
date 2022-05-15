@@ -1,5 +1,4 @@
 import string
-from unittest import result 
 import nltk
 from nltk.corpus import stopwords
 import imdb
@@ -60,7 +59,7 @@ def remove_punctuation(seq, return_as_str=False):
 
     return format_return(seq, return_as_str)
 
-def _increment_award_val(result_dict, key, val):
+def _increment_dict_val(result_dict, key, val):
     if key not in result_dict:
         result_dict[key] = val
     else:
@@ -75,7 +74,7 @@ def _increment_award_presenter(award_dict, award, name, val):
     else:
         award_dict[award][name] += val
 
-def awards_to_people_parser(award_ppl_dict):
+def awards_to_people_parser(award_ppl_dict, and_odds=None):
     nltk_dict = dict()
     ia = imdb.IMDb()
     result_dict = dict()
@@ -95,7 +94,7 @@ def awards_to_people_parser(award_ppl_dict):
             num_nnp = 0
             if found_name == 0 or found_name == '': continue
 
-
+            #check if pronoun by nltk
             if found_name != 0:
                 found_list = found_name.split(" ")
                 uppercase_found_list = []
@@ -117,6 +116,7 @@ def awards_to_people_parser(award_ppl_dict):
                     else:
                         num_nnp += 1
             if num_nnp == 0: continue
+
             
             # if imdb marked it as a nickname, remove nickname marker
             if found_list[-1] == "nickname": 
@@ -127,39 +127,69 @@ def awards_to_people_parser(award_ppl_dict):
                 found_list = new_found_list
                 found_name = " ".join(new_found_list)
             
-            # if good length for name, increase weight
+            #check and update and_odds
+            if and_odds != None and name in and_odds:
+                if and_odds[name] > 2:
+                    if found_name in and_odds:
+                        and_odds[found_name] += and_odds[name]
+                        val += 5
+                    else:
+                        and_odds[found_name] = and_odds[name]
+                        val += 5
+
+            # if good length for name and search result is perfect match, increase weight
             name_list = name.split(" ")
             if len(found_list) == len(name_list):
                 if len(found_list) == 2:
                     val = val * 5
                     if found_list == name_list:
                         val = val * 5
+                # if a less common length for name, and search result is perfect match, increase weight
+                if len(found_list) == 3 and num_nnp != 0:
+                    if found_list == name_list:
+                        val = val * 5
 
+            # check for similarity of name
             if found_name == name:
                 if len(found_name) > 1:
                     val = val * 5
             else:
                 for part in found_list:
                     if part == name:
-                        val = val * 1.5
+                        val = val * 3
             _increment_award_presenter(correct_names_dict, award, found_name, val)
 
-    #print(correct_names_dict)
     for award, person_dict in correct_names_dict.items():
+        possible_ands = []
+        for person, score in person_dict.items():
+            if person in and_odds:
+                if and_odds[person] > 0:
+                    possible_ands.append([person, score])
+        sorted(possible_ands, key=lambda x: x[1], reverse=True)
+        print(possible_ands)
         max_persons = [None, None]
         max_scores = [0, 0]
+        
         for person, score in person_dict.items():
             if score > max_scores[0]:
                 max_persons[1], max_scores[1] = max_persons[0], max_scores[0]
                 max_persons[0], max_scores[0] = person, score
             elif score > max_scores[1]:
                 max_persons[1], max_scores[1] = person, score
+
+
         
-        if max_scores[0] > max_scores[1] / 4 and max_persons[1] != None and len(max_persons[0]) == len(max_persons[1]):
-            result_dict[award] = max_persons
+        # if we think it's presented by two people
+        if max_persons[0] in and_odds:
+            if max_persons[1] in and_odds:
+                result_dict[award] = max_persons
+        elif max_persons[1] in and_odds:
+            result_dict[award] = [possible_ands[0][0], possible_ands[1][0]]
+        # otherwise
         else:
-            result_dict[award] =  max_persons#[max_persons[0]]
-    #print(result_dict)
+            result_dict[award] =  [max_persons[0]]#[max_persons[0]]
+    print(and_odds)
+    print(correct_names_dict['best foreign language film'])
     return result_dict
         #sort by value
         #check for whether or not word is nltktagged as NNP, not tagged as NNP --> .25x
