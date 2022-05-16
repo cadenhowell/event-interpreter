@@ -59,21 +59,22 @@ def imdb_check_movie_date(movie_match, date):
     return None
 
 def imdb_get_similar(entity, ia, year=None, type='movie'):
-    entity = entity.lower()
-    if type in ["movie", "tv series"]:
-        entity_results = ia.search_movie(entity)
-    else:
+    found_result = _search(entity, ia, type)
+    if not found_result or (type != "person" and not _is_valid(found_result, year, type)): 
+        return None
+    return found_result.get('name').lower() if type == "person" else found_result.get('title').lower()
+
+def _search(entity, ia, type):
+    if type == "person":
         entity_results = ia.search_person(entity)
-    if not entity_results: return None
-    found_result = entity_results[0]
-    if _is_valid(found_result, year, type):
-        return found_result.get('name').lower() if type == "person" else found_result.get('title').lower()
-    return None
+    else:
+         entity_results = ia.search_movie(entity)
+    return entity_results[0] if entity_results else None
 
 def _is_valid(result, year, type):
-    if type in ["movie", "tv series"] and type != result.get('kind'): return False
-    if result.get('year') is not None and str(int(result.get('year')) + 1) != year: return False
-    return True
+    type_check = type == result.get('kind')
+    year_check = result.get('year') is not None and str(int(result.get('year')) + 1) == year
+    return type_check and year_check
 
 # will return most similar movie and entity
 def imdb_get_similar_entity(entity, ia, year=None):

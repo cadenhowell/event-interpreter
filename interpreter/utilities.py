@@ -1,6 +1,7 @@
 import string
 
 import imdb
+import imdb_api
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
@@ -90,7 +91,7 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
             val = item[1]
             # perform imdb check and value mutation
 
-            found_name = imdb_api.imdb_get_similar_people(name, ia)
+            found_name = imdb_api.imdb_get_similar(name, ia, type="person")
             num_nnp = 0
             if found_name == 0 or found_name == '': continue
 
