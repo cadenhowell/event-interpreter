@@ -76,16 +76,11 @@ def _is_valid(result, year, type):
     return True
 
 # will return most similar movie and entity
-<<<<<<< HEAD
 def imdb_get_similar_entity(entity, ia, year=None):
     similar = []
     for type in ["movie", "person", "tv series"]:
         similar.append(imdb_get_similar(entity, ia, year, type))
     return similar
-=======
-def imdb_get_similar_entity(entity, ia):
-    return imdb_get_similar_movie(entity, ia), imdb_get_similar_entity(entity, ia)
->>>>>>> 99b4fec38e97813f9d4b944ff244eba56624c513
 
 '''
 print(imdb_check_entity('mel gibson', ia, 2014))
@@ -96,14 +91,4 @@ print(ia.get_movie_infoset())
 print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
-<<<<<<< HEAD
 #print(imdb_get_similar_people('stallone', ia, 2013))
-=======
-#print(imdb_get_similar_people('stallone', ia, 2013))
-
-
-
-
-
-
->>>>>>> 99b4fec38e97813f9d4b944ff244eba56624c513
