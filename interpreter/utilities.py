@@ -1,11 +1,11 @@
 import string
+
+import imdb
 import nltk
 from nltk.corpus import stopwords
-import imdb
-import imdb_api
 nltk.download('stopwords')
-from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
@@ -27,9 +27,9 @@ def lower(seq, return_as_str=False):
     lower_str, lower_lst = None, None
 
     if type(seq) is str:
-        lower_str = str.lower()
+        lower_str = seq.lower()
     else:
-        lower_lst = list(map(str.lower(), seq))
+        lower_lst = list(map(str.lower, seq))
 
     return format_return(lower_str or lower_lst, return_as_str)
 
@@ -47,7 +47,7 @@ def stem(seq, return_as_str=False):
         seq = tokenize(seq)
 
     ps = PorterStemmer()
-    stemmed_lst = list(map(ps.stem(), seq))
+    stemmed_lst = list(map(ps.stem, seq))
     
     return format_return(stemmed_lst, return_as_str)
 

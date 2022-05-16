@@ -1,5 +1,6 @@
 '''Version 0.35'''
 import json
+import time
 import os.path
 import host_interpreter as host
 import nominee_interpreter as nominee
@@ -30,13 +31,13 @@ def get_awards(year):
     of this function or what it returns.'''
     # Your code here
     return awards
-
+    
 def get_nominees(year):
     '''Nominees is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns.'''
     loaded_data = fetch_data(year)
-    nominees = nominee.find_nominees(loaded_data, OFFICIAL_AWARDS_1315)
+    nominees = nominee.find_nominees(loaded_data, OFFICIAL_AWARDS_1315, year)
     return nominees
 
 def get_winner(year):
@@ -72,11 +73,15 @@ def main():
     and then run gg_api.main(). This is the second thing the TA will
     run when grading. Do NOT change the name of this function or
     what it returns.'''
+    start = time.time()
     years = ['2013', '2015']
     for year in years:
         print(f'{year} hosts: {get_hosts(year)}')
-        #print(f'{year} nominees: {get_nominees(year)}')
+        print(f'{year} nominees: {get_nominees(year)}')
         print(f'{year} presenters: {get_presenters(year)}')
+    finish = time.time()
+    #print elapsed time in minutes and seconds
+    print(f'Elapsed time: {(finish - start) / 60} minutes')
 
     return
 
