@@ -88,7 +88,7 @@ print(ia.get_movie_infoset())
 print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
-print(imdb_get_similar_people('stallone', ia, 2013))
+#print(imdb_get_similar_people('stallone', ia, 2013))
 
 
 
