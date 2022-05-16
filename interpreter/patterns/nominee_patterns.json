@@ -1,0 +1,20 @@
+{
+    "positive_patterns": 
+        [
+            "nomin"
+        ],
+    "negative_patterns": 
+        [
+            "wish"
+        ],
+    "remove_patterns":
+        [
+            "golden globes",
+            "goldenglobes",
+            "#",
+            "oscars?",
+            "@\\S*\\s?",
+            "\\brt\\b",
+            "http\\S*\\s?"
+        ]
+}

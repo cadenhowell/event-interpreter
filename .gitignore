@@ -132,3 +132,9 @@ dmypy.json
 /*.json
 /data/*.json
 /gg-project-master-master/
+
+#VS Code
+.vscode/
+
+#mac
+.DS_Store

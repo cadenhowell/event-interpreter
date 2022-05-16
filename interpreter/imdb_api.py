@@ -58,26 +58,29 @@ def imdb_check_movie_date(movie_match, date):
             return int(check_date)
     return None
 
-def imdb_get_similar_people(person, ia):
-    person = person.lower()
-    person_results = ia.search_person(person)
-    if person_results == []: return 0
-    for found_person in person_results:
-        return found_person.get('name').lower()
+def imdb_get_similar(entity, ia, year=None, type='movie'):
+    entity = entity.lower()
+    if type in ["movie", "tv series"]:
+        entity_results = ia.search_movie(entity)
+    else:
+        entity_results = ia.search_person(entity)
+    if not entity_results: return None
+    found_result = entity_results[0]
+    if _is_valid(found_result, year, type):
+        return found_result.get('name').lower() if type == "person" else found_result.get('title').lower()
+    return None
 
-    return ''
-
-def imdb_get_similar_movie(movie, ia):
-    movie = movie.lower()
-    movie_results = ia.search_movie(movie)
-    if movie_results == []: return 0
-    for found_movie in movie_results:
-        return found_movie.get('title').lower()
-    return ''
+def _is_valid(result, year, type):
+    if type in ["movie", "tv series"] and type != result.get('kind'): return False
+    if result.get('year') is not None and str(int(result.get('year')) + 1) != year: return False
+    return True
 
 # will return most similar movie and entity
-def imdb_get_similar_entity(entity, ia):
-    return imdb_get_similar_movie(entity, ia), imdb_get_similar_entity(entity, ia)
+def imdb_get_similar_entity(entity, ia, year=None):
+    similar = []
+    for type in ["movie", "person", "tv series"]:
+        similar.append(imdb_get_similar(entity, ia, year, type))
+    return similar
 
 '''
 print(imdb_check_entity('mel gibson', ia, 2014))
@@ -89,9 +92,3 @@ print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
 #print(imdb_get_similar_people('stallone', ia, 2013))
-
-
-
-
-
-
