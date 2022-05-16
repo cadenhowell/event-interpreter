@@ -77,7 +77,7 @@ def imdb_get_similar_movie(movie, ia):
 
 # will return most similar movie and entity
 def imdb_get_similar_entity(entity, ia):
-    return imdb_get_similar_movie, imdb_get_similar_entity
+    return imdb_get_similar_movie(entity, ia), imdb_get_similar_entity(entity, ia)
 
 '''
 print(imdb_check_entity('mel gibson', ia, 2014))
@@ -88,7 +88,7 @@ print(ia.get_movie_infoset())
 print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
-print(imdb_check_person('robert', ia, 2013))
+print(imdb_get_similar_people('stallone', ia, 2013))
 
 
 
