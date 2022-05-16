@@ -6,7 +6,8 @@ def increment_dict_val(target_dict, key, val):
     else:
         target_dict[key] += val
 
-def find_host(data, num_hosts):   
+def find_host(data, num_hosts):
+    has_cohost_dict = dict() 
     host_dict = dict()
     for post in data:
         tweet = re.sub(r'[^\w\s]', '', post['text'])
@@ -22,6 +23,9 @@ def find_host(data, num_hosts):
                 continue
             # find 'and' to see if listing both hosts
             name_index_2 = -1
+            if "amp" in tl_split_lower and tl_split_lower.index("amp") + 2 < len(tl_split_lower):
+                name_index_2 = tl_split_lower.index("amp") + 1
+
             if "and" in tl_split_lower and tl_split_lower.index("and") + 2 < len(tl_split_lower):
                 name_index_2 = tl_split_lower.index("and") + 1
 
@@ -38,11 +42,19 @@ def find_host(data, num_hosts):
                 name_2 = first_name_2.capitalize() + " " + last_name_2.capitalize()
                 increment_dict_val(host_dict, name_1, value)
                 increment_dict_val(host_dict, name_2, value)
+                increment_dict_val(has_cohost_dict, name_1, value)
+                increment_dict_val(has_cohost_dict, name_2, value)
             else:
                 name_1 = tl_split[name_index].capitalize() + " " + tl_split[name_index + 1].capitalize()
                 increment_dict_val(host_dict, name_1, 1)
     sorted_host_dict = sorted(host_dict.items(), key=lambda x: x[1], reverse=True)
     hosts = []
-    for i in range(num_hosts):
-        hosts.append(sorted_host_dict[i][0])
+    most_likely_host = sorted_host_dict[0][0]
+    most_likely_weight = sorted_host_dict[0][1]
+    # if 1/5 of the most likely host tweets also mention a second host
+    if has_cohost_dict[most_likely_host] < most_likely_weight * 5:
+        hosts.append(sorted_host_dict[0][0])
+        hosts.append(sorted_host_dict[1][0])
+    else:
+        hosts.append(sorted_host_dict[0][0])
     return hosts
