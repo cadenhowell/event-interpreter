@@ -31,8 +31,8 @@ def find_awards(data, awards, year):
     # Load NER tagger
     nlp = en_core_web_md.load()
 
-  #  allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS', 'PRODUCT','LANGUAGE'}
-    allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS', 'NORP', 'GPE', 'LOCATION', 'PRODUCT'}
+    allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS'}
+ #   allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS', 'NORP', 'GPE', 'LOCATION', 'PRODUCT'}
 
     res = []
     for tweet in preprocessed_tweets:
