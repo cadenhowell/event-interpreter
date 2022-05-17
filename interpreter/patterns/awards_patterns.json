@@ -3,10 +3,13 @@
         [
             "best",
             "won",
-            "award"
+            "award",
+            "goes to"
         ],
     "negative_patterns": 
         [
+            "goes to the"
+
         ],
     "remove_patterns":
         [
