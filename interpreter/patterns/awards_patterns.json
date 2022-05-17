@@ -1,0 +1,21 @@
+{
+    "positive_patterns": 
+        [
+            "best",
+            "won",
+            "award"
+        ],
+    "negative_patterns": 
+        [
+        ],
+    "remove_patterns":
+        [
+            "golden globes",
+            "goldenglobes",
+            "#",
+            "oscars?",
+            "@\\S*\\s?",
+            "\\brt\\b",
+            "http\\S*\\s?"
+        ]
+}

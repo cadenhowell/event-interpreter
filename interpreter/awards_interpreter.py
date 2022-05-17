@@ -26,7 +26,7 @@ def find_awards(data, awards):
 
 def _preprocess(data):
     text_lst = [post['text'] for post in data]
-    search_words = ['award', 'awarded', 'awards', 'nominees','nominated']
+    search_words = ['won','award', 'awarded', 'awards', 'nominees','nominated']
     text_lst = [seq for seq in text_lst if any(word in seq for word in search_words)]
     text_lst = utilities.remove_punctuation(text_lst)
     return text_lst
