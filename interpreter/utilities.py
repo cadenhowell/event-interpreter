@@ -56,9 +56,10 @@ def remove_punctuation(seq, return_as_str=False):
     if type(seq) is str:
         seq = seq.translate(str.maketrans('', '', string.punctuation))
     else:
-        seq = [token for token in seq if token not in string.punctuation]
+        seq = [token.translate(str.maketrans('', '', string.punctuation)) for token in seq]
 
     return format_return(seq, return_as_str)
+
 
 def _increment_dict_val(result_dict, key, val):
     if key not in result_dict:
