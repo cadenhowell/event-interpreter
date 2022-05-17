@@ -2,7 +2,7 @@ import json
 import re
 from collections import Counter
 
-import en_core_web_md
+import en_core_web_sm
 import imdb
 import nltk
 import spacy
@@ -12,11 +12,13 @@ from nltk import edit_distance
 import utilities
 from imdb_api import imdb_get_similar
 
-spacy.load('en_core_web_md')
+spacy.load('en_core_web_sm')
 nltk.download('punkt')
 
 
 def find_nominees(data, awards, year):
+    if len(data) > 200000:
+        data = random.sample(data, 200000)
     nominees = {award: [] for award in awards}
     possible_nominees = {award: Counter() for award in awards}
 
@@ -41,9 +43,12 @@ def find_nominees(data, awards, year):
     )
 
     ia = imdb.IMDb()
-    nlp = en_core_web_md.load()
-
+    nlp = en_core_web_sm.load()
+    i = 0
     for post, preprocessed_post in zip(posts, preprocessed_posts):
+        if i % 10000 == 0:
+            print(f' {i}/{len(posts)}')
+        i += 1
         award = get_relevant_award(preprocessed_post, preprocessed_awards)
         if not award: continue
 
@@ -68,8 +73,7 @@ def find_nominees(data, awards, year):
             if any(token in award for token in ['actor', 'actress', 'director', 'producer', 'writer']):
                 closest = imdb_get_similar(likely_nominee, ia, year, 'person')
             elif any(token in award for token in ['series', 'television']):
-                closest = imdb_get_similar(
-                    likely_nominee, ia, year, 'tv series')
+                closest = imdb_get_similar(likely_nominee, ia, year, 'tv series')
             elif any(token in award for token in ['movie', 'film', 'motion picture']):
                 closest = imdb_get_similar(likely_nominee, ia, year, 'movie')
             else:

@@ -72,9 +72,13 @@ def _search(entity, ia, type):
     return entity_results[0] if entity_results else None
 
 def _is_valid(result, year, type):
-    type_check = type == result.get('kind')
-    year_check = result.get('year') is not None and str(int(result.get('year')) + 1) == year
-    return type_check and year_check
+    if type != result.get('kind'): return False
+    result_year = result.get('year')
+    if not result_year: return True
+    if type == "movie":
+        return int(result_year) + 1 == int(year)
+    else:
+        return int(year) - int(result_year) in [1, 2]
 
 # will return most similar movie and entity
 def imdb_get_similar_entity(entity, ia, year=None):

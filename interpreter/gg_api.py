@@ -83,12 +83,12 @@ def main():
     run when grading. Do NOT change the name of this function or
     what it returns.'''
     start = time.time()
-    years = ['2013', '2015']
+    years = ['2015']
     for year in years:
         # print(f'{year} hosts: {get_hosts(year)}')
-        # print(f'{year} nominees: {get_nominees(year)}')
+        print(f'{year} nominees: {get_nominees(year)}')
         # print(f'{year} presenters: {get_presenters(year)}')
-        print(f'{year} award names: {get_awards(year)}')
+        # print(f'{year} award names: {get_awards(year)}')
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')
