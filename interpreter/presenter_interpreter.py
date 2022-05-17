@@ -30,6 +30,13 @@ def has_presenter_words(t_split):
         result.append('present')
     return result
 
+def has_keyword_words(t_split, wordlist):
+    result = []
+    for word in wordlist:
+        if word in t_split:
+            result.append(word)
+    return result
+
 def no_uncertain_words(t_split):
     return all(['should' not in t_split, 'wish' not in t_split, 'would' not in t_split])
 
@@ -129,6 +136,29 @@ def backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award,
             backward_check_for_names_from_index(name1_index, t_split, dense_t_split, tl_split_lower, award_dict, and_odds, matched_award) 
         return
 
+def backward_check_for_winners(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, keyword):
+        keyword_index = tl_split_lower.index(keyword)
+        dense_t_split_lower = []
+        for word in dense_t_split:
+            dense_t_split_lower.append(word.lower())
+
+        if keyword_index == 0: return
+        #print(keyword)
+        #print(dense_t_split)
+        name1_index = None
+        nameword_index = keyword_index - 1
+        while nameword_index >= 0:
+            if t_split[nameword_index] in dense_t_split:
+                first_potential_nameword = dense_t_split[dense_t_split.index(t_split[nameword_index])]
+                name1_index = t_split.index(first_potential_nameword)
+                break
+            nameword_index -= 1
+        #name1_index = keyword_index - 1
+        if name1_index == None: return
+        
+        backward_check_for_names_from_index(name1_index, t_split, dense_t_split, tl_split_lower, award_dict, and_odds, matched_award) 
+        return
+
 def process_presented(t_split, tl_split_lower, award_dict, matched_award, and_odds):
     #print(t_split)
     dense_t_split = utilities.remove_stop_words(t_split)
@@ -141,17 +171,18 @@ def process_presented(t_split, tl_split_lower, award_dict, matched_award, and_od
         name_1 = t_split[name1_index].capitalize() + " " + t_split[name1_index + 1].capitalize()
         increment_award_presenter(award_dict, matched_award, name_1, 1)
     else:
-        backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, "presented")
-
-        
+        backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, "presented")    
 
 def process_presenting(t_split, tl_split_lower, award_dict, matched_award, and_odds):
     dense_t_split = utilities.remove_stop_words(t_split)
     backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, "presenting")
 
-def process_presents(t_split, tl_split_lower, award_dict, matched_award, and_odds):
+def process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword, type='presenters'):
     dense_t_split = utilities.remove_stop_words(t_split)
-    backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, "presents")
+    if type == 'presenters':
+        backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, keyword)
+    if type == 'winners':
+        backward_check_for_winners(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds, keyword)
 
 def process_present(t_split, tl_split_lower, award_dict, matched_award, and_odds):
     dense_t_split = utilities.remove_stop_words(t_split)
@@ -161,7 +192,41 @@ def process_presenter(t_split, tl_split_lower, award_dict, matched_award, and_od
     dense_t_split = utilities.remove_stop_words(t_split)
     backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds,"presenter")
 
+def find_winners(data, awards_official):
+    # get awards and award_no_stop
+    awards = [[awards_official[i], utilities.remove_stop_words(awards_official[i])] for i in range(len(awards_official))]
+    and_odds = dict()
+    # TODO: get winners
+    winners_dict = dict()
 
+    award_dict = dict()
+    for award in awards:
+        award_dict[award[0]] = dict()
+    
+    for post in data:
+        tweet = re.sub(r'[^\w\s]', '', post['text'])
+        t_lower = tweet.lower()
+        t_split = tweet.split()
+        tl_split_lower = t_lower.split()
+        #if has presented by and does not have words that indicate inaccuracy
+        won_indicators = has_keyword_words(tl_split_lower, ['won', 'win', 'wins', 'winning', 'winner'])
+        if won_indicators != [] and no_uncertain_words(tl_split_lower):
+            matched_award_vector = find_matched_awards(awards, t_split, winners_dict)
+            if matched_award_vector == None: continue
+            matched_award = matched_award_vector[0]
+            #print(tweet)
+
+            for won_word in won_indicators:
+                if won_word == 'won': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="won", type='winners')
+                if won_word == 'win': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="win", type='winners')
+                if won_word == 'wins': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="wins", type='winners')
+                if won_word == 'winning': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="winning", type='winners')
+                if won_word == 'winner': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="winner", type='winners')
+    print('before lookups')
+    print(award_dict)
+    #print(and_odds)
+    result = utilities.awards_to_winner_parser(award_dict)
+    return result
 
 def find_presenters(data, awards_official):
     # get awards and award_no_stop
@@ -189,10 +254,10 @@ def find_presenters(data, awards_official):
 
             for present_word in presenter_indicators:
                 if present_word == 'presented': process_presented(t_split, tl_split_lower, award_dict, matched_award, and_odds)
-                if present_word == 'presents': process_presents(t_split, tl_split_lower, award_dict, matched_award, and_odds)
-                if present_word == 'presenting': process_presenting(t_split, tl_split_lower, award_dict, matched_award, and_odds)
-                if present_word == 'present': process_present(t_split, tl_split_lower, award_dict, matched_award, and_odds)
-                if present_word == 'presenter': process_presenter(t_split, tl_split_lower, award_dict, matched_award, and_odds)
+                if present_word == 'presents': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="presents")
+                if present_word == 'presenting': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="presenting")
+                if present_word == 'present': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="present")
+                if present_word == 'presenter': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="presenter")
 
     
     #print(and_odds)
