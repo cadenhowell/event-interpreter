@@ -60,6 +60,7 @@ def imdb_check_movie_date(movie_match, date):
 
 def imdb_get_similar(entity, ia, year=None, type='movie'):
     found_result = _search(entity, ia, type)
+    print(found_result)
     if not found_result or (type != "person" and not _is_valid(found_result, year, type)): 
         return None
     return found_result.get('name').lower() if type == "person" else found_result.get('title').lower()
@@ -96,4 +97,5 @@ print(ia.get_movie_infoset())
 print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
+print(imdb_get_similar('argo', ia, type='movie'))
 #print(imdb_get_similar_people('stallone', ia, 2013))

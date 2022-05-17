@@ -52,6 +52,7 @@ def get_winner(year):
     '''Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns.'''
+
     fres = get_answers(year)
     winners = {award: fres['award_data'][award]['winner'] for award in OFFICIAL_AWARDS_1315}
     return winners
@@ -85,10 +86,10 @@ def main():
     start = time.time()
     years = ['2015']
     for year in years:
-        # print(f'{year} hosts: {get_hosts(year)}')
+        print(f'{year} hosts: {get_hosts(year)}')
         print(f'{year} nominees: {get_nominees(year)}')
-        # print(f'{year} presenters: {get_presenters(year)}')
-        # print(f'{year} award names: {get_awards(year)}')
+        print(f'{year} presenters: {get_presenters(year)}')
+        print(f'{year} award names: {get_awards(year)}')
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')

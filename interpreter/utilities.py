@@ -1,4 +1,5 @@
 import string
+import re
 
 import imdb
 import imdb_api
@@ -7,7 +8,6 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
-
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
 
@@ -85,7 +85,7 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
         if len(people_dict) == 0:
             result_dict[award] = ''
             continue
-
+            
         sorted_people = sorted(people_dict.items(), key=lambda x: x[1], reverse=True)
         for item in sorted_people:
             name = item[0]
@@ -94,10 +94,10 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
 
             found_name = imdb_api.imdb_get_similar(name, ia, type="person")
             num_nnp = 0
-            if found_name == 0 or found_name == '': continue
+            if found_name == None or found_name == '': continue
 
-            #check if pronoun by nltk
-            if found_name != 0:
+            #check if proper noun by nltk
+            if found_name != None:
                 found_list = found_name.split(" ")
                 uppercase_found_list = []
                 for i in found_list:
@@ -168,7 +168,6 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
                 if and_odds[person] > 0:
                     possible_ands.append([person, score])
         sorted(possible_ands, key=lambda x: x[1], reverse=True)
-        print(possible_ands)
         max_persons = [None, None]
         max_scores = [0, 0]
         
@@ -190,11 +189,142 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
         # otherwise
         else:
             result_dict[award] =  [max_persons[0]]#[max_persons[0]]
-    print(and_odds)
-    print(correct_names_dict['best foreign language film'])
     return result_dict
         #sort by value
         #check for whether or not word is nltktagged as NNP, not tagged as NNP --> .25x
         #if exact match for search term, add 5x value
         #if shared word with search term, 2x value
 
+def empasize_shared_dictvals(award_entity_dict):
+
+    for award, entity_dict in award_entity_dict.items():
+        # for the top 10 potential names in each award dict, increase their values based on how many words they share
+        # with other found entities
+        sorted_entities = sorted(entity_dict.items(), key=lambda x: x[1], reverse=True)
+        cutoff_index = min(len(sorted_entities), 10)
+        sorted_entities = sorted_entities[0:cutoff_index]
+        for likely_entity in sorted_entities:
+            likely_name = likely_entity[0]
+            likely_val = likely_entity[1]
+            likely_name_s = likely_name.split(" ")
+            for other_entity in sorted_entities:
+                other_name = other_entity[0]
+                other_val = other_entity[1]
+                if likely_name in other_name:
+                    if len(likely_name_s) > 1:
+                        likely_val += other_val
+
+            award_entity_dict[award][likely_entity[0]] = likely_val
+
+
+def awards_to_winner_parser(award_winner_dict):
+    nltk_dict = dict()
+    ia = imdb.IMDb()
+    result_dict = dict()
+    correct_names_dict = dict()
+
+    #empasize_shared_dictvals(award_winner_dict)
+
+    for award, entity_dict in award_winner_dict.items():
+        if len(entity_dict) == 0:
+            result_dict[award] = ''
+            continue
+
+        sorted_people = sorted(entity_dict.items(), key=lambda x: x[1], reverse=True)
+
+        for item in sorted_people[0:4]:
+            name = item[0]
+            val = item[1]
+            # perform imdb check and value mutation
+
+            found_name_list = imdb_api.imdb_get_similar_entity(name, ia) 
+            for found_name in found_name_list:
+                if found_name == None: continue
+
+                # if good length for name and search result is perfect match, increase weight
+                found_name_split = found_name.split(" ")
+                name_split = name.split(" ")
+                # if imdb marked it as a nickname, remove nickname marker
+                if found_name_split[-1] == "nickname": 
+                    found_name_split.pop()
+                    new_found_name_list = []
+                    for element in found_name_split:
+                        if element != '': new_found_name_list.append(element)
+                    found_name_split = new_found_name_list
+                    found_name = " ".join(new_found_name_list)
+
+
+
+                if len(found_name_split) == len(name_split):
+                    if len(found_name_split) > 1:
+                        val = val * 2
+                    else:
+                        val = val * 1.5
+
+
+                        
+                # check for single non-verb non-noun names
+                if len(found_name_split) == 1:
+                    if found_name_split[0] == "Best" or found_name_split[0] == "best": continue
+                    found_name_no_punctuation = re.sub(r'[^\w\s]', '', found_name_split[0])
+                    if found_name_no_punctuation in nltk_dict:
+                        l1 = nltk_dict[found_name_no_punctuation]
+                    else:
+                        name_token = tokenize(found_name_no_punctuation)
+                        l1 = nltk.pos_tag(name_token)
+                        nltk_dict[name] = l1
+                    # if title is just a part of speech like 'the' or 'by', skip
+                    if l1[0][1] == 'CC' or l1[0][1] == 'DT'or l1[0][1] == 'IN':
+                        continue
+
+                # check for similarity of name
+                if found_name == name:
+                    if len(found_name) > 1:
+                        val = val * 2
+                    else:
+                        val = val * 1.5
+                else:
+                    for part in found_name_list:
+                        if part == name:
+                            val = val * 1.25
+                _increment_award_presenter(correct_names_dict, award, found_name, val)
+
+    for award, person_dict in correct_names_dict.items():
+        sorted_entities = sorted(person_dict.items(), key=lambda x: x[1], reverse=True)
+        result_entities = sorted_entities[0:5]
+
+        # process subnames
+        for entity_index in range(len(result_entities)):
+            entity = result_entities[entity_index]
+            for second_entity_index in range(len(result_entities)):
+                second_entity = result_entities[second_entity_index]
+                if is_subname(entity[0], second_entity[0]):
+                    result_entities[second_entity_index] = (second_entity[0], entity[1] + second_entity[1])
+        sorted_result_entities = sorted(result_entities, key=lambda x:x[1], reverse=True)
+        result_dict[award] = sorted_result_entities
+    # if something wins more than 3 categories, toss it (variety m-name)
+    win_count = dict()
+    for award, winner_list in result_dict.items():
+        for entity in winner_list:
+            _increment_dict_val(win_count, entity[0], 1)
+    print(win_count)
+    for award, winner_list in result_dict.items():
+        if len(winner_list) != 0:
+            for entity_index in range(len(winner_list)):
+                entity = winner_list[entity_index]
+                if entity[0] in win_count and win_count[entity[0]] > 2:
+                    winner_list[entity_index] = [entity[0], 0]
+            print(winner_list)
+            winner_list_sorted = sorted(winner_list, key=lambda x:x[1], reverse=True)
+            result_dict[award] = winner_list_sorted[0][0]
+    print(result_dict)
+    return result_dict
+    # TODO: add way of scanning dict for commonly shared words, and increasing their weight.
+def is_subname(subname, name):
+    subname_list = subname.split(" ")
+    name_list = name.split(" ")
+    if len(subname_list) + 1 != len(name_list):
+        return False
+    for sub in subname_list:
+        if sub in name_list:
+            return True
