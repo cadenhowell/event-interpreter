@@ -1,8 +1,9 @@
 {
     "preprocess_positive_patterns": 
         [
-            "won",
-            "win"
+            "nomin",
+            "win",
+            "won"
         ],
     "preprocess_negative_patterns": 
         [

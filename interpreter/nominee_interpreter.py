@@ -2,7 +2,7 @@ import json
 import re
 from collections import Counter
 
-import en_core_web_sm
+import en_core_web_md
 import imdb
 import nltk
 import spacy
@@ -12,26 +12,31 @@ from nltk import edit_distance
 import utilities
 from imdb_api import imdb_get_similar
 
-spacy.load('en_core_web_sm')
+spacy.load('en_core_web_md')
 nltk.download('punkt')
 
 
 def find_nominees(data, awards, year):
-    if len(data) > 200000:
-        data = random.sample(data, 200000)
-    nominees = {award: [] for award in awards}
-    possible_nominees = {award: Counter() for award in awards}
+    posts, preprocessed_awards, preprocessed_posts = preprocess(data, awards)
+    possible_nominees = get_possible_nominees(awards, preprocessed_awards, posts, preprocessed_posts)
+    for k, v in possible_nominees.items():
+        print(k, v, "\n")
+    true_nominees = get_true_nominees(year, awards, possible_nominees)
+    return true_nominees
 
+
+def preprocess(data, awards):
+    n = 175000
+    if len(data) > n:
+        data = random.sample(data, n)
     with open('./interpreter/patterns/nominee_patterns.json', 'r') as f:
         patterns = json.load(f)
-
     posts = filter_format_data(
         data, 
         patterns["preprocess_positive_patterns"], 
         patterns["preprocess_negative_patterns"], 
         patterns["preprocess_remove_patterns"]
     )
-
     preprocessed_awards = preprocess_awards_for_similarity(
         awards, 
         patterns["similarity_award_remove_patterns"],
@@ -41,49 +46,48 @@ def find_nominees(data, awards, year):
         posts, 
         patterns["similarity_post_remove_patterns"]
     )
+    return posts, preprocessed_awards, preprocessed_posts
 
-    ia = imdb.IMDb()
-    nlp = en_core_web_sm.load()
-    i = 0
+
+def get_possible_nominees(awards, preprocessed_awards, posts, preprocessed_posts):
+    possible_nominees = {award: Counter() for award in awards}
+    nlp = en_core_web_md.load()
     for post, preprocessed_post in zip(posts, preprocessed_posts):
-        if i % 10000 == 0:
-            print(f' {i}/{len(posts)}')
-        i += 1
         award = get_relevant_award(preprocessed_post, preprocessed_awards)
         if not award: continue
-
         ner_tagged_post = nlp(post)
-        likely_nominees = [chunk.text.lower() for chunk in ner_tagged_post.ents]
+        likely_nominees = set([chunk.text.lower() for chunk in ner_tagged_post.ents])
         if not likely_nominees: continue
-
         for nominee in likely_nominees:
-            if nominee not in award:
-                possible_nominees[award][nominee] += 1
-        # if random.random() < 0.05:
-        #     print(post)
-        #     print(award)
-        #     print(likely_nominees)
-        #     print("\n")
-    for key, value in possible_nominees.items():
-        print(key, value, "\n")
-    for award, possible_nominees in possible_nominees.items():
-        for likely_nominee, _ in possible_nominees.most_common():
-            if len(nominees[award]) == 1:
-                break
-            if any(token in award for token in ['actor', 'actress', 'director', 'producer', 'writer']):
-                closest = imdb_get_similar(likely_nominee, ia, year, 'person')
-            elif any(token in award for token in ['series', 'television']):
-                closest = imdb_get_similar(likely_nominee, ia, year, 'tv series')
-            elif any(token in award for token in ['movie', 'film', 'motion picture']):
-                closest = imdb_get_similar(likely_nominee, ia, year, 'movie')
-            else:
-                closest = imdb_get_similar(likely_nominee, ia, year, 'person')
-            if closest and edit_distance(likely_nominee, closest) < 3:
-                if closest not in nominees[award]:
-                    nominees[award].append(closest)
-                print(f'{closest} added to {award}')
+            if nominee in award: continue
+            if get_award_type(award) == "person" and any([chunk.label_ != "PERSON" for chunk in ner_tagged_post.ents]): continue
+            possible_nominees[award][nominee] += 1
+    return possible_nominees
 
+
+def get_true_nominees(year, awards, possible_nominees):
+    nominees = {award: [] for award in awards}
+    ia = imdb.IMDb()
+    for award, possible_nominees in possible_nominees.items():
+        for likely_nominee, _ in possible_nominees.most_common(20):
+            if len(nominees[award]) == 5: break
+            print(f'Checking {likely_nominee} for {award}')
+            award_type = get_award_type(award)
+            closest = imdb_get_similar(likely_nominee, ia, year, award_type)
+            if closest and edit_distance(likely_nominee, closest) < 3 and closest not in nominees[award]:
+                print(f'Adding {closest} to {award}')
+                nominees[award].append(closest)
     return nominees
+
+
+def get_award_type(award):
+    if any(token in award for token in ['actor', 'actress', 'director', 'producer', 'writer']):
+        return "person"
+    elif any(token in award for token in ['series', 'television']):
+        return 'tv series'
+    elif any(token in award for token in ['movie', 'film', 'motion picture']):
+        return 'movie'
+    return "person"
 
 
 def filter_format_data(data, positive_patterns, negative_patterns, patterns_to_remove):

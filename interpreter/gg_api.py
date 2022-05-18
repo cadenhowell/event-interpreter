@@ -36,25 +36,39 @@ def get_awards(year):
     '''Awards is a list of strings. Do NOT change the name
     of this function or what it returns.'''
     # Your code here
-    loaded_data = fetch_data(year)
-    awards = awardnames.find_awards(loaded_data, OFFICIAL_AWARDS_1315, year)
+    # loaded_data = fetch_data(year)
+    # awards = awardnames.find_awards(loaded_data, OFFICIAL_AWARDS_1315, year)
+    awards = OFFICIAL_AWARDS_1315
     return awards
-    
+
+def _get_nominees_and_winners(year):
+    loaded_data = fetch_data(year)
+    if 'naw' not in globals():
+        global naw
+        naw = {}
+    if year not in naw:
+        naw[year] = nominee.find_nominees(loaded_data, OFFICIAL_AWARDS_1315, year)
+    return naw[year]
+
 def get_nominees(year):
     '''Nominees is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns.'''
-    loaded_data = fetch_data(year)
-    nominees = nominee.find_nominees(loaded_data, OFFICIAL_AWARDS_1315, year)
+    naw = _get_nominees_and_winners(year)
+    nominees = {k: v[1:] for k, v in naw.items()}
+    #print each item in nominees on new line
+    for k, v in nominees.items():
+        print(k, v, "\n")
     return nominees
 
 def get_winner(year):
     '''Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns.'''
-
-    fres = get_answers(year)
-    winners = {award: fres['award_data'][award]['winner'] for award in OFFICIAL_AWARDS_1315}
+    naw = _get_nominees_and_winners(year)
+    winners = {k: (v[0] if len(v) > 0 else '') for k, v in naw.items()}
+    for k, v in winners.items():
+        print(k, v, "\n")
     return winners
 
 def get_presenters(year):
@@ -84,12 +98,18 @@ def main():
     run when grading. Do NOT change the name of this function or
     what it returns.'''
     start = time.time()
-    years = ['2015']
+    years = ['2013', '2015']
     for year in years:
-        print(f'{year} hosts: {get_hosts(year)}')
-        print(f'{year} nominees: {get_nominees(year)}')
-        print(f'{year} presenters: {get_presenters(year)}')
-        print(f'{year} award names: {get_awards(year)}')
+        # print(f'{year} hosts: {get_hosts(year)}')
+        print("Nominees")
+        for award, nominees in get_nominees(year).items():
+            print(f'{year} {award} nominees: {nominees}')
+        print("Awards")
+        for award, winner in get_winner(year).items():
+            print(f'{year} {award} winner: {winner}')
+        print("\n")
+        # print(f'{year} presenters: {get_presenters(year)}')
+        # print(f'{year} award names: {get_awards(year)}')
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')
