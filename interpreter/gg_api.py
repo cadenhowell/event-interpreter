@@ -71,8 +71,6 @@ def get_presenters(year):
     '''Presenters is a dictionary with the hard coded award
     names as keys, and each entry a list of strings. Do NOT change the
     name of this function or what it returns.'''
-    #loaded_data = fetch_data(year)
-    #presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315)
     # Your code here
     loaded_data = fetch_data(year)
     presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315, year)
