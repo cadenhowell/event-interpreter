@@ -52,6 +52,9 @@ def get_nominees(year):
     the name of this function or what it returns.'''
     naw = _get_nominees_and_winners(year)
     nominees = {k: v[1:] for k, v in naw.items()}
+    for award in OFFICIAL_AWARDS_1315:
+        if award not in nominees:
+            nominees[award] = ''
     #print each item in nominees on new line
     for k, v in nominees.items():
         print(k, v, "\n")
@@ -63,6 +66,9 @@ def get_winner(year):
     Do NOT change the name of this function or what it returns.'''
     naw = _get_nominees_and_winners(year)
     winners = {k: (v[0] if len(v) > 0 else '') for k, v in naw.items()}
+    for award in OFFICIAL_AWARDS_1315:
+        if award not in winners:
+            winners[award] = ''
     for k, v in winners.items():
         print(k, v, "\n")
     return winners
@@ -74,6 +80,9 @@ def get_presenters(year):
     # Your code here
     loaded_data = fetch_data(year)
     presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315, year)
+    for award in OFFICIAL_AWARDS_1315:
+        if award not in presenters:
+            presenters[award] = ''
     return presenters
 
 def pre_ceremony():

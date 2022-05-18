@@ -1,9 +1,11 @@
 import re
-import nltk
 import string
+
+import nltk
 from nltk.tokenize import word_tokenize
-from imdb_api import imdb_get_similar
+
 import imdb
+from imdb_api import imdb_get_similar
 
 
 nltk.download('punkt')
@@ -28,7 +30,6 @@ def _has_link_indicator(next_word):
 
 def find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split):
     t_split = t.split(" ")
-    #print(t_split)
 
     best_index = tnp_l_split.index("best")
     temp_index = best_index
@@ -63,7 +64,6 @@ def find_potential_quote_awards(award_name_dict, t_split, t_l_split, keyword):
     start_index = t_l_split.index(best_word)
     temp_index = start_index + 1
     award_name = 'best'
-    tnp_l_split = [re.sub(r'[^\w\s]', '', t_l_split[i]) for i in range(len(t_l_split))]
     immediate_stop = False
     while temp_index + 1 < len(t_split) and not _has_end_punctuation(t_split[temp_index]):
         next_word = t_split[temp_index]
@@ -95,7 +95,6 @@ def find_awards(data, year=None):
         tnp_split = tnp.split(" ")
 
         if 'Best' in tnp_split:
-            #print(t)
             find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split)
         if '\'Best' in t_split:
             t_l = t.lower()
@@ -138,11 +137,10 @@ def find_awards(data, year=None):
     parsed_top_sorted_awards = sorted(top_sorted_awards, key=lambda x: x[1], reverse=True)
     parsed_top_sorted_awards = parsed_top_sorted_awards[:25]
     for award in parsed_top_sorted_awards:
-        print(award)
         result.append(award[0])
-
-    #print(and_odds)
-    return list(map(removenames, result))
+    result_nltkchecked = list(map(removenames, result))
+    final_list = [result_nltkchecked[i] for i in range(len(result_nltkchecked))]
+    return final_list
 
 def removenames(text):
     nltk_results = ne_chunk(pos_tag(word_tokenize(text)))

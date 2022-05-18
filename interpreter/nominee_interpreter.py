@@ -20,7 +20,8 @@ def find_nominees(data, awards, year):
     posts, preprocessed_awards, preprocessed_posts = preprocess(data, awards)
     possible_nominees = get_possible_nominees(awards, preprocessed_awards, posts, preprocessed_posts)
     for k, v in possible_nominees.items():
-        print(k, v, "\n")
+        #print(k, v, "\n")
+        pass
     true_nominees = get_true_nominees(year, awards, possible_nominees)
     return true_nominees
 
@@ -71,11 +72,11 @@ def get_true_nominees(year, awards, possible_nominees):
     for award, possible_nominees in possible_nominees.items():
         for likely_nominee, _ in possible_nominees.most_common(20):
             if len(nominees[award]) == 5: break
-            print(f'Checking {likely_nominee} for {award}')
+            #print(f'Checking {likely_nominee} for {award}')
             award_type = get_award_type(award)
             closest = imdb_get_similar(likely_nominee, ia, year, award_type)
             if closest and edit_distance(likely_nominee, closest) < 3 and closest not in nominees[award]:
-                print(f'Adding {closest} to {award}')
+                #print(f'Adding {closest} to {award}')
                 nominees[award].append(closest)
     return nominees
 

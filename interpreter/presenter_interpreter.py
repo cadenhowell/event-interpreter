@@ -12,7 +12,6 @@ def increment_dict_val(target_dict, key, val):
         target_dict[key] += val
 
 def increment_award_presenter(award_dict, award, name, val):
-    #print('incrementing name', name)
     if name not in award_dict[award]:
         award_dict[award][name] = val
     else:
@@ -114,8 +113,7 @@ def backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award,
             dense_t_split_lower.append(word.lower())
 
         if keyword_index == 0: return
-        #print(keyword)
-        #print(dense_t_split)
+
         first_potential_nameword = dense_t_split[dense_t_split_lower.index(keyword) - 1]
         name1_index = t_split.index(first_potential_nameword)
         #name1_index = keyword_index - 1
@@ -138,7 +136,6 @@ def backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award,
 
 
 def process_presented(t_split, tl_split_lower, award_dict, matched_award, and_odds):
-    #print(t_split)
     dense_t_split = utilities.remove_stop_words(t_split)
     if "by" in t_split:
         name1_index = tl_split_lower.index("by") + 1
@@ -193,7 +190,6 @@ def find_presenters(data, awards_official, year):
             matched_award_vector = find_matched_awards(awards, t_split, winners_dict)
             if matched_award_vector == None: continue
             matched_award = matched_award_vector[0]
-            #print(tweet)
 
             for present_word in presenter_indicators:
                 if present_word == 'presented': process_presented(t_split, tl_split_lower, award_dict, matched_award, and_odds)
@@ -203,7 +199,6 @@ def find_presenters(data, awards_official, year):
                 if present_word == 'presenter': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="presenter")
 
     
-    #print(and_odds)
     result = utilities.awards_to_people_parser(award_dict, year, and_odds)
     return result
 
@@ -219,8 +214,6 @@ def backward_check_for_winners(tl_split_lower, t_split, award_dict, matched_awar
             dense_t_split_lower.append(word.lower())
 
         if keyword_index == 0: return
-        #print(keyword)
-        #print(dense_t_split)
         name1_index = None
         nameword_index = keyword_index - 1
         while nameword_index >= 0:
@@ -258,7 +251,6 @@ def find_winners(data, awards_official, year):
             matched_award_vector = find_matched_awards(awards, t_split, winners_dict)
             if matched_award_vector == None: continue
             matched_award = matched_award_vector[0]
-            #print(tweet)
 
             for won_word in won_indicators:
                 if won_word == 'won': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="won", type='winners')
@@ -266,8 +258,5 @@ def find_winners(data, awards_official, year):
                 if won_word == 'wins': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="wins", type='winners')
                 if won_word == 'winning': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="winning", type='winners')
                 if won_word == 'winner': process_backwards_keyword(t_split, tl_split_lower, award_dict, matched_award, and_odds, keyword="winner", type='winners')
-    print('before lookups')
-    print(award_dict)
-    #print(and_odds)
     result = utilities.awards_to_winner_parser(award_dict, year)
     return result

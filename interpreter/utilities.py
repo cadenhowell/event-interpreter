@@ -307,17 +307,15 @@ def awards_to_winner_parser(award_winner_dict, year):
     for award, winner_list in result_dict.items():
         for entity in winner_list:
             _increment_dict_val(win_count, entity[0], 1)
-    print(win_count)
+
     for award, winner_list in result_dict.items():
         if len(winner_list) != 0:
             for entity_index in range(len(winner_list)):
                 entity = winner_list[entity_index]
                 if entity[0] in win_count and win_count[entity[0]] > 2:
                     winner_list[entity_index] = [entity[0], 0]
-            print(winner_list)
             winner_list_sorted = sorted(winner_list, key=lambda x:x[1], reverse=True)
             result_dict[award] = winner_list_sorted[0][0]
-    print(result_dict)
     return result_dict
     # TODO: add way of scanning dict for commonly shared words, and increasing their weight.
 def is_subname(subname, name):
