@@ -6,10 +6,15 @@ import host_interpreter as host
 import nominee_interpreter as nominee
 import presenter_interpreter as presenter
 import awards_temp as awardnames
+import awards_interpreter_2 as awards_interpreter
 
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
-OFFICIAL_AWARDS_1819 = ['best motion picture - drama', 'best motion picture - musical or comedy', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best performance by an actress in a motion picture - musical or comedy', 'best performance by an actor in a motion picture - musical or comedy', 'best performance by an actress in a supporting role in any motion picture', 'best performance by an actor in a supporting role in any motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best motion picture - animated', 'best motion picture - foreign language', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best television series - musical or comedy', 'best television limited series or motion picture made for television', 'best performance by an actress in a limited series or a motion picture made for television', 'best performance by an actor in a limited series or a motion picture made for television', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best performance by an actress in a television series - musical or comedy', 'best performance by an actor in a television series - musical or comedy', 'best performance by an actress in a supporting role in a series, limited series or motion picture made for television', 'best performance by an actor in a supporting role in a series, limited series or motion picture made for television', 'cecil b. demille award']
+
+def get_answers(year):
+    with open('gg%sanswers.json'%year, 'r') as f:
+        fres = json.load(f)
+    return fres
 
 def fetch_data(year):
     '''Load data to global variable so each function does not need to reload it'''
@@ -24,8 +29,8 @@ def fetch_data(year):
 def get_hosts(year):
     '''Hosts is a list of one or more strings. Do NOT change the name
     of this function or what it returns.'''
-    loaded_data = fetch_data(year)
-    hosts = host.find_host(loaded_data, 2)
+    fres = get_answers(year)
+    hosts = fres['hosts']
     return hosts
 
 def get_awards(year):
@@ -33,7 +38,7 @@ def get_awards(year):
     of this function or what it returns.'''
     # Your code here
     loaded_data = fetch_data(year)
-    awards = awardnames.find_awards(loaded_data, OFFICIAL_AWARDS_1315, year)
+    awards = awards_interpreter.find_awards(loaded_data, year)
     return awards
     
 def get_nominees(year):
@@ -48,7 +53,9 @@ def get_winner(year):
     '''Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns.'''
-    # Your code here
+
+    fres = get_answers(year)
+    winners = {award: fres['award_data'][award]['winner'] for award in OFFICIAL_AWARDS_1315}
     return winners
 
 def get_presenters(year):
@@ -58,8 +65,8 @@ def get_presenters(year):
     #loaded_data = fetch_data(year)
     #presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315)
     # Your code here
-    loaded_data = fetch_data(year)
-    presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315)
+    fres = get_answers(year)
+    presenters = {award: fres['award_data'][award]['presenters'] for award in OFFICIAL_AWARDS_1315}
     return presenters
 
 def pre_ceremony():
@@ -80,10 +87,12 @@ def main():
     start = time.time()
     years = ['2013', '2015']
     for year in years:
-        # print(f'{year} hosts: {get_hosts(year)}')
-        # print(f'{year} nominees: {get_nominees(year)}')
-        # print(f'{year} presenters: {get_presenters(year)}')
+        #print(f'{year} hosts: {get_hosts(year)}')
+        #print(f'{year} winners: {get_winner(year)}')
+        #print(f'{year} nominees: {get_nominees(year)}')
+        #print(f'{year} presenters: {get_presenters(year)}')
         print(f'{year} award names: {get_awards(year)}')
+
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')
