@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import re
 from collections import Counter
@@ -21,7 +22,7 @@ def preprocess(data, awards):
     n = 175000
     if len(data) > n:
         data = random.sample(data, n)
-    with open('src/patterns/nominee_patterns.json', 'r') as f:
+    with open(f'{os.path.dirname(__file__)}/../patterns/nominee_patterns.json', 'r') as f:
         patterns = json.load(f)
     posts = filter_format_data(
         data, 

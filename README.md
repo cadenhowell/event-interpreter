@@ -1,4 +1,15 @@
-# Event Interpreter 
+# Event Interpreter (https://github.com/cadenhowell/event-interpreter)
+## How to Run
+1) Pip install requirements.txt into virtual environment
+2) Enter the src directory
+3) To get human readable output, run: `python gg_api.py`<br>
+To get autograder output, run: `python  autograder.py`<br>
+    You can supply autograder with the optional flags of either 2013 or 2015 (will run both if not specified) and any number of the following tasks (will run all if none specified)
+    - hosts
+    - awards
+    - nomniees
+    - presenters
+    - winner
 
 ## Project Deliverables
 
