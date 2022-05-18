@@ -50,9 +50,6 @@ def get_nominees(year):
     the name of this function or what it returns.'''
     naw = _get_nominees_and_winners(year)
     nominees = {k: v[1:] for k, v in naw.items()}
-    for award in OFFICIAL_AWARDS:
-        if award not in nominees:
-            nominees[award] = ''
     return nominees
 
 def get_winner(year):
@@ -61,9 +58,6 @@ def get_winner(year):
     Do NOT change the name of this function or what it returns.'''
     naw = _get_nominees_and_winners(year)
     winners = {k: (v[0] if len(v) > 0 else '') for k, v in naw.items()}
-    for award in OFFICIAL_AWARDS:
-        if award not in winners:
-            winners[award] = ''
     return winners
 
 def get_presenters(year):
@@ -74,7 +68,7 @@ def get_presenters(year):
     presenters = presenter_interpreter.find_presenters(loaded_data, OFFICIAL_AWARDS, year)
     for award in OFFICIAL_AWARDS:
         if award not in presenters:
-            presenters[award] = ''
+            presenters[award] = []
     return presenters
 
 def get_sentiment_comparison(year, people_list):
