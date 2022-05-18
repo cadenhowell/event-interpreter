@@ -172,7 +172,7 @@ def score_structured(year, answers, info_type):
     results = getattr(gg_api, 'get_%s' % info_type)(year)
     length = 26
 
-    if info_type == "gg":
+    if info_type == "nominees":
         tempans = answers['award_data']['cecil b. demille award']
         del answers['award_data']['cecil b. demille award']
         tempres = results['cecil b. demille award']
