@@ -5,11 +5,17 @@ import imdb
 import imdb_api
 import nltk
 from nltk.corpus import stopwords
+from nltk.corpus import wordnet as wn
 nltk.download('stopwords')
 from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
+from nltk.tree import Tree
+from nltk import ne_chunk, pos_tag, word_tokenize
+from nltk.sentiment import SentimentIntensityAnalyzer
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
+nltk.download('vader_lexicon')
 
 def tokenize(str):
     return word_tokenize(str)
@@ -307,7 +313,6 @@ def awards_to_winner_parser(award_winner_dict, year):
     for award, winner_list in result_dict.items():
         for entity in winner_list:
             _increment_dict_val(win_count, entity[0], 1)
-
     for award, winner_list in result_dict.items():
         if len(winner_list) != 0:
             for entity_index in range(len(winner_list)):
@@ -326,3 +331,33 @@ def is_subname(subname, name):
     for sub in subname_list:
         if sub in name_list:
             return True
+
+# Finds person mentioned and tweet, first value is true for postive
+def tweet_opinion(tweet):
+    sia = SentimentIntensityAnalyzer()
+
+    net_opinion = sia.polarity_scores(tweet)["compound"] > 0
+    ents = [] # List of tuples, i.e. `PERSON, Bradley Cooper`
+    for sent in nltk.sent_tokenize(tweet):
+        for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent))):
+            if hasattr(chunk, 'label'):
+                ents.append((chunk.label(), chunk[0][0]))
+    
+    # Optional crude pass, return 1 person from ent list
+    person_topic = None
+    for ent in ents:
+        if ent[0] == "PERSON":
+            person_topic = ent[1]
+            break
+    return [net_opinion, person_topic]
+
+# Get surrounding adjectives for word, can be used to check "Dressed"
+# POS over wordnet pass
+def topic_descriptors(tweet, target_word):
+    index = (i for i,word in enumerate(tweet) if word==target_word)
+    neighbor_words = []
+    for i in index:
+        neighbor_words.append(tweet[i-3:i]+tweet[i+1:i+4])
+    adjective_tags = ["JJ", "JJR", "JJS"]
+    neighbor_adjectives = [a[0] for a in nltk.pos_tag(" ".join(neighbor_words)) if a[1] in adjective_tags ]
+    return neighbor_adjectives
