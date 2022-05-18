@@ -1,3 +1,4 @@
+from ctypes import util
 import json
 import re
 from collections import Counter
@@ -9,6 +10,7 @@ from nltk import edit_distance
 import spacy
 #from imdb_api import imdb_get_similar
 import utilities
+import string
 
 spacy.load('en_core_web_md')
 nltk.download('punkt')
@@ -20,10 +22,8 @@ def find_awards(data, awards, year):
     # Track number of times each potential nominee is mentioned for each award
     filtered_data = filter_data(data)
 
-    functs_to_map = [utilities.remove_punctuation,
-                     utilities.lower, 
-                     utilities.remove_stop_words, 
-                     utilities.stem]
+    functs_to_map = [utilities.lower,
+                     utilities.remove_stop_words]
     preprocessed_tweets = preprocess_tweets(filtered_data, functs_to_map)
 
    # ia = imdb.IMDb()
@@ -31,18 +31,33 @@ def find_awards(data, awards, year):
     # Load NER tagger
     nlp = en_core_web_md.load()
 
-    allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS'}
+    allowed_labels = {'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS','PRODUCT'}
  #   allowed_labels = {'PERSON', 'WORK_OF_ART', 'EVENT', 'ORGANIZATIONS', 'NORP', 'GPE', 'LOCATION', 'PRODUCT'}
 
     res = []
     for tweet in preprocessed_tweets:
         
-        tagged_text = list(map(nlp, tweet))
-        likely_award_chunks = [chunk.text for seq in tagged_text for chunk in seq.ents if chunk.label_ in allowed_labels ]
-        counter = Counter(filter(bool, likely_award_chunks))
-        if len(counter): res.extend([ item[0] for item in counter.most_common(1) ])
+        # tagged_text = list(map(nlp, tweet))
+        # likely_award_chunks = [chunk.text for seq in tagged_text for chunk in seq.ents if chunk.label_ in allowed_labels ]
+        # counter = Counter(filter(bool, likely_award_chunks))
+        # if len(counter): res.extend([ item[0] for item in counter.most_common(1) ])
 
-    return res
+
+        tweet = ' '.join(tweet)
+        if("best" in tweet):
+            index_of_best = tweet.index("best")
+            for i in range(index_of_best+4, len(tweet)):
+                if(tweet[i] in string.punctuation and tweet[i] != '-'):
+                    res.append(tweet[index_of_best:i])
+                    break
+            else:
+                res.append(tweet[index_of_best:])
+            if("goes to" in tweet):
+                index_of_goesto = tweet.index("goes to")
+                res.append(tweet[index_of_best:index_of_goesto])
+    
+    return list(set(res))
+
 
 
 def filter_data(data):
@@ -87,12 +102,16 @@ def preprocess_tweets(tweets, funcs):
 
 
 
+# nlp = en_core_web_md.load()
+
+# for award in OFFICIAL_AWARDS_1315:
+#     for chunk in nlp(award).ents:
+#         print(chunk.text, chunk.label_)
 
 
 
 
-
-# s = 'Timothee Chalamet totally deserved to win Best Actor! He is the loml.'
+# s = 'Timothee Chalamet totally deserved to win Best Actor and thank god! He is the loml.'
 # nlp = en_core_web_md.load()
 
 # for chunk in nlp(s).ents:

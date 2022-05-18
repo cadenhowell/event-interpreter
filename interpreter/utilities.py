@@ -217,7 +217,7 @@ def empasize_shared_dictvals(award_entity_dict):
             award_entity_dict[award][likely_entity[0]] = likely_val
 
 
-def awards_to_winner_parser(award_winner_dict):
+def awards_to_winner_parser(award_winner_dict, year):
     nltk_dict = dict()
     ia = imdb.IMDb()
     result_dict = dict()
@@ -237,7 +237,7 @@ def awards_to_winner_parser(award_winner_dict):
             val = item[1]
             # perform imdb check and value mutation
 
-            found_name_list = imdb_api.imdb_get_similar_entity(name, ia) 
+            found_name_list = imdb_api.imdb_get_similar_entity(name, ia, year) 
             for found_name in found_name_list:
                 if found_name == None: continue
 
