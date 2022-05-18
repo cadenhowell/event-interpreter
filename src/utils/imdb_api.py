@@ -1,6 +1,6 @@
-import imdb
-import inspect
 import re
+
+import imdb
 
 # you will need to call 'var = imdb.IMDb() and pass var into get_imdb_check(entity, var) for it to have a db to reference
 ia = imdb.IMDb()
@@ -87,15 +87,3 @@ def imdb_get_similar_entity(entity, ia, year=None):
     for type in ["movie", "person", "tv series"]:
         similar.append(imdb_get_similar(entity, ia, year, type))
     return similar
-
-'''
-print(imdb_check_entity('mel gibson', ia, 2014))
-print(imdb_check_movie('Cheaper by the Dozen', ia, 2023))
-print(imdb_check_person('mel gibson', ia, 2014))
-print(imdb_check_person('Cheaper by the Dozen', ia, 2023))
-print(ia.get_movie_infoset())
-print(ia.get_person_infoset())
-print(imdb_check_movie('Batman', ia, 2014))
-'''
-# print(imdb_get_similar('argo', ia, type='movie'))
-#print(imdb_get_similar_people('stallone', ia, 2013))

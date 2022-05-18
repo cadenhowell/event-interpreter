@@ -2,19 +2,10 @@ import re
 import string
 
 import nltk
-from nltk.tokenize import word_tokenize
-
-import imdb
-from imdb_api import imdb_get_similar
-
-
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('maxent_ne_chunker')
-nltk.download('words')
-
 from nltk import ne_chunk, pos_tag, word_tokenize
+from nltk.tokenize import word_tokenize
 from nltk.tree import Tree
+
 
 def _increment_dict_val(target_dict, key, val):
     if key not in target_dict:

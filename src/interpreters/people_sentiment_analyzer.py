@@ -1,4 +1,4 @@
-import utilities
+from utils import utilities
 import re
 
 def analyze_people(host_list, data):
