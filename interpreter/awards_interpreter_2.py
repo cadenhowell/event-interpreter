@@ -2,7 +2,17 @@ import re
 import nltk
 import string
 from nltk.tokenize import word_tokenize
+from imdb_api import imdb_get_similar
+import imdb
 
+
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
+
+from nltk import ne_chunk, pos_tag, word_tokenize
+from nltk.tree import Tree
 
 def _increment_dict_val(target_dict, key, val):
     if key not in target_dict:
@@ -130,5 +140,17 @@ def find_awards(data, year=None):
     for award in parsed_top_sorted_awards:
         print(award)
         result.append(award[0])
+
     #print(and_odds)
-    return result
+    return list(map(removenames, result))
+
+def removenames(text):
+    nltk_results = ne_chunk(pos_tag(word_tokenize(text)))
+    for nltk_result in nltk_results:
+        if type(nltk_result) == Tree:
+            name = ''
+            for nltk_result_leaf in nltk_result.leaves():
+                name += nltk_result_leaf[0] + ' '
+            print('Type: ', nltk_result.label(), 'Name: ', name)
+            text = text.replace(nltk_result.text, '')
+    return text
