@@ -102,9 +102,9 @@ def main():
     pre_ceremony()
     years = ['2013', '2015']
     for year in years:
-        # print(f'{year} Hosts\n\n{get_hosts(year)}\n\n')
-        # print(f'{year} Nominees\n\n{get_nominees(year)}\n\n')
-        # print(f'{year} Winners\n\n{get_winner(year)}\n\n')
+        print(f'{year} Hosts\n\n{get_hosts(year)}\n\n')
+        print(f'{year} Nominees\n\n{get_nominees(year)}\n\n')
+        print(f'{year} Winners\n\n{get_winner(year)}\n\n')
         print(f'{year} Presenters\n\n{get_presenters(year)}\n\n')
         print(f'{year} Award names\n\n{get_awards(year)}\n\n')
     finish = time.time()
