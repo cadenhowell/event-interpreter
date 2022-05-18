@@ -57,4 +57,6 @@ def find_host(data):
         hosts.append(sorted_host_dict[1][0])
     else:
         hosts.append(sorted_host_dict[0][0])
+    for index in range(len(hosts)):
+        hosts[index] = hosts[index].lower()
     return hosts

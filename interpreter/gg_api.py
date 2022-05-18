@@ -7,6 +7,7 @@ import nominee_interpreter as nominee
 import presenter_interpreter as presenter
 import awards_temp as awardnames
 import awards_interpreter_2 as awards_interpreter
+import people_sentiment_analyzer as sentiment
 
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
@@ -85,6 +86,11 @@ def get_presenters(year):
             presenters[award] = ''
     return presenters
 
+def get_sentiment_analysis(people_list, year):
+    loaded_data = fetch_data(year)
+    sentiment_dict = sentiment.analyze_people(people_list, loaded_data)
+    return sentiment_dict
+
 def pre_ceremony():
     '''This function loads/fetches/processes any data your program
     will use, and stores that data in your DB or in a json, csv, or
@@ -103,7 +109,8 @@ def main():
     start = time.time()
     years = ['2013', '2015']
     for year in years:
-        print(f'{year} hosts: {get_hosts(year)}')
+        hosts = get_hosts(year)
+        print(f'{year} hosts: {hosts}')
         print("Nominees")
         for award, nominees in get_nominees(year).items():
             print(f'{year} {award} nominees: {nominees}')
@@ -114,6 +121,7 @@ def main():
         print(f'{year} presenters: {get_presenters(year)}')
         print('Award Names')
         print(f'{year} award names: {get_awards(year)}')
+        print(f'{year} host sentiment analysis: {get_sentiment_analysis(hosts, year)}')
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')
