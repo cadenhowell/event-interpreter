@@ -171,7 +171,7 @@ def score_structured(year, answers, info_type):
     results = getattr(gg_api, 'get_%s' % info_type)(year)
     length = 26
 
-    if info_type == "nominees":
+    if info_type == "gg":
         tempans = answers['award_data']['cecil b. demille award']
         del answers['award_data']['cecil b. demille award']
         tempres = results['cecil b. demille award']
@@ -206,7 +206,7 @@ def main(years, grading):
 
     scores = {y: {g: {t:0 for t in types} for g in grading} for y in years}
     for y in years:
-        with open('gg%sanswers.json' % y, 'r') as f:
+        with open('../data/gg%sanswers.json' % y, 'r') as f:
             answers = json.load(f)
 
         answers['awards'] = list(answers['award_data'].keys())

@@ -1,27 +1,18 @@
 import json
+import random
 import re
 from collections import Counter
 
 import en_core_web_md
 import imdb
-import nltk
-import spacy
-import random
 from nltk import edit_distance
-
-import utilities
-from imdb_api import imdb_get_similar
-
-spacy.load('en_core_web_md')
-nltk.download('punkt')
+from utils import utilities
+from utils.imdb_api import imdb_get_similar
 
 
 def find_nominees(data, awards, year):
     posts, preprocessed_awards, preprocessed_posts = preprocess(data, awards)
     possible_nominees = get_possible_nominees(awards, preprocessed_awards, posts, preprocessed_posts)
-    for k, v in possible_nominees.items():
-        #print(k, v, "\n")
-        pass
     true_nominees = get_true_nominees(year, awards, possible_nominees)
     return true_nominees
 
@@ -30,7 +21,7 @@ def preprocess(data, awards):
     n = 175000
     if len(data) > n:
         data = random.sample(data, n)
-    with open('patterns/nominee_patterns.json', 'r') as f:
+    with open('src/patterns/nominee_patterns.json', 'r') as f:
         patterns = json.load(f)
     posts = filter_format_data(
         data, 
@@ -72,11 +63,9 @@ def get_true_nominees(year, awards, possible_nominees):
     for award, possible_nominees in possible_nominees.items():
         for likely_nominee, _ in possible_nominees.most_common(20):
             if len(nominees[award]) == 5: break
-            #print(f'Checking {likely_nominee} for {award}')
             award_type = get_award_type(award)
             closest = imdb_get_similar(likely_nominee, ia, year, award_type)
             if closest and edit_distance(likely_nominee, closest) < 3 and closest not in nominees[award]:
-                #print(f'Adding {closest} to {award}')
                 nominees[award].append(closest)
     return nominees
 

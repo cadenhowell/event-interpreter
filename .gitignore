@@ -129,7 +129,6 @@ dmypy.json
 .pyre/
 
 # json data in base directory and data subdirectory
-/*.json
 /data/*.json
 /gg-project-master-master/
 

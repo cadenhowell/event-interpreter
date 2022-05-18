@@ -1,0 +1,1 @@
+Please place gg2013.json and gg2015.json in these directory after downloading and unzipping

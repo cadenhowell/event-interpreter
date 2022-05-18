@@ -1,21 +1,15 @@
-import string
 import re
+import string
 
 import imdb
-import imdb_api
 import nltk
+from nltk import word_tokenize
 from nltk.corpus import stopwords
-from nltk.corpus import wordnet as wn
-nltk.download('stopwords')
-from nltk.stem import PorterStemmer
-from nltk.tree import Tree
-from nltk import ne_chunk, pos_tag, word_tokenize
 from nltk.sentiment import SentimentIntensityAnalyzer
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('maxent_ne_chunker')
-nltk.download('words')
-nltk.download('vader_lexicon')
+from nltk.stem import PorterStemmer
+
+from utils import imdb_api
+
 
 def tokenize(str):
     return word_tokenize(str)

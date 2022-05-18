@@ -1,9 +1,7 @@
-from collections import Counter
 import re
-import utilities
-import json
-import nltk
-nltk.download('punkt')
+
+from utils import utilities
+
 
 def increment_dict_val(target_dict, key, val):
     if key not in target_dict:
