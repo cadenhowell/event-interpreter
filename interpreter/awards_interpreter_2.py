@@ -13,30 +13,12 @@ def _increment_dict_val(target_dict, key, val):
 def _has_end_punctuation(word):
     return len(word) > 0 and word[-1] in string.punctuation and "-" not in word
 
-def _has_start_punctuation(word):
-    return word[0] in string.punctuation
-
-def _has_punctuation(word):
-    for letter in word:
-        if letter in string.punctuation: return True
-    return False
-
-def _is_capitalized(word):
-    return word[0].isupper()
-
-def _not_first_index(num):
-    return num != 0
-
-def _in_wordlist(word, wordlist):
-    return word in wordlist
-
 def _has_link_indicator(next_word):
     return '\\' in next_word or '/' in next_word or 'http' in next_word or '#' in next_word
 
-def find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split, award_end_punctuation):
+def find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split):
     t_split = t.split(" ")
     #print(t_split)
-    tnp_split = tnp.split(" ")
 
     best_index = tnp_l_split.index("best")
     temp_index = best_index
@@ -93,8 +75,6 @@ def find_potential_quote_awards(award_name_dict, t_split, t_l_split, keyword):
 def find_awards(data, year=None):
     result = []
     award_name_dict = dict()
-    #award_end_words = ['goes', 'won', 'wins', 'at', 'award', 'from', 'for', 'at', 'of']
-    award_end_punctuation = [',', '.', ':', ';','(', ')']
     
     for post in data:
         t = post['text']
@@ -106,7 +86,7 @@ def find_awards(data, year=None):
 
         if 'Best' in tnp_split:
             #print(t)
-            find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split, award_end_punctuation)
+            find_potential_awards(t, award_name_dict, tnp, tnp_split, tnp_l, tnp_l_split)
         if '\'Best' in t_split:
             t_l = t.lower()
             t_l_split = t_l.split(" ")
