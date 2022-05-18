@@ -2,11 +2,12 @@
 Version 0.6
 Python 3
 '''
-import sys
-import json
 import difflib
-from pprint import pprint
+import json
+import os
+import sys
 from collections import Counter
+from pprint import pprint
 
 from nltk.metrics import edit_distance
 
@@ -202,11 +203,12 @@ def score_unstructured(year, answers, info_type):
 
 
 def main(years, grading):
+    gg_api.pre_ceremony()
     types = ['spelling', 'completeness']
 
     scores = {y: {g: {t:0 for t in types} for g in grading} for y in years}
     for y in years:
-        with open('../data/gg%sanswers.json' % y, 'r') as f:
+        with open(f'{os.path.dirname(__file__)}/../data/gg{y}answers.json', 'r') as f:
             answers = json.load(f)
 
         answers['awards'] = list(answers['award_data'].keys())
