@@ -73,6 +73,7 @@ def _search(entity, ia, type):
     return entity_results[0] if entity_results else None
 
 def _is_valid(result, year, type):
+    if year == None: return True
     if type != result.get('kind'): return False
     result_year = result.get('year')
     if not result_year: return True
@@ -97,5 +98,5 @@ print(ia.get_movie_infoset())
 print(ia.get_person_infoset())
 print(imdb_check_movie('Batman', ia, 2014))
 '''
-print(imdb_get_similar('argo', ia, type='movie'))
+print(imdb_get_similar('argo', ia, None, type='movie'))
 #print(imdb_get_similar_people('stallone', ia, 2013))
