@@ -90,7 +90,7 @@ def find_potential_quote_awards(award_name_dict, t_split, t_l_split, keyword):
     if len(split_award_name) > 1: _increment_dict_val(award_name_dict, award_name, 5)
 
 
-def find_awards(data, year):
+def find_awards(data, year=None):
     result = []
     award_name_dict = dict()
     #award_end_words = ['goes', 'won', 'wins', 'at', 'award', 'from', 'for', 'at', 'of']
@@ -149,5 +149,6 @@ def find_awards(data, year):
     parsed_top_sorted_awards = parsed_top_sorted_awards[:25]
     for award in parsed_top_sorted_awards:
         print(award)
+        result.append(award[0])
     #print(and_odds)
     return result
