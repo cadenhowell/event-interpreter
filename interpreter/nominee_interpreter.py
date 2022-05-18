@@ -29,7 +29,7 @@ def preprocess(data, awards):
     n = 175000
     if len(data) > n:
         data = random.sample(data, n)
-    with open('./interpreter/patterns/nominee_patterns.json', 'r') as f:
+    with open('patterns/nominee_patterns.json', 'r') as f:
         patterns = json.load(f)
     posts = filter_format_data(
         data, 

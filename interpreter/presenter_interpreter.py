@@ -171,7 +171,7 @@ def process_presenter(t_split, tl_split_lower, award_dict, matched_award, and_od
     backward_check_for_names(tl_split_lower, t_split, award_dict, matched_award, dense_t_split, and_odds,"presenter")
 
 
-def find_presenters(data, awards_official):
+def find_presenters(data, awards_official, year):
     # get awards and award_no_stop
     awards = [[awards_official[i], utilities.remove_stop_words(awards_official[i])] for i in range(len(awards_official))]
     and_odds = dict()
@@ -204,7 +204,7 @@ def find_presenters(data, awards_official):
 
     
     #print(and_odds)
-    result = utilities.awards_to_people_parser(award_dict, and_odds)
+    result = utilities.awards_to_people_parser(award_dict, year, and_odds)
     return result
 
 # FUTURE IMPROVEMENTS

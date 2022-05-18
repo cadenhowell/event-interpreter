@@ -6,7 +6,7 @@ def increment_dict_val(target_dict, key, val):
     else:
         target_dict[key] += val
 
-def find_host(data, num_hosts):
+def find_host(data):
     has_cohost_dict = dict() 
     host_dict = dict()
     for post in data:

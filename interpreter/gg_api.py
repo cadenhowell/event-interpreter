@@ -11,10 +11,6 @@ import awards_interpreter_2 as awards_interpreter
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
 
-def get_answers(year):
-    with open('gg%sanswers.json'%year, 'r') as f:
-        fres = json.load(f)
-    return fres
 
 def fetch_data(year):
     '''Load data to global variable so each function does not need to reload it'''
@@ -29,8 +25,8 @@ def fetch_data(year):
 def get_hosts(year):
     '''Hosts is a list of one or more strings. Do NOT change the name
     of this function or what it returns.'''
-    fres = get_answers(year)
-    hosts = fres['hosts']
+    loaded_data = fetch_data(year)
+    hosts = host.find_host(loaded_data)
     return hosts
 
 def get_awards(year):
@@ -78,8 +74,8 @@ def get_presenters(year):
     #loaded_data = fetch_data(year)
     #presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315)
     # Your code here
-    fres = get_answers(year)
-    presenters = {award: fres['award_data'][award]['presenters'] for award in OFFICIAL_AWARDS_1315}
+    loaded_data = fetch_data(year)
+    presenters = presenter.find_presenters(loaded_data, OFFICIAL_AWARDS_1315, year)
     return presenters
 
 def pre_ceremony():
@@ -100,16 +96,17 @@ def main():
     start = time.time()
     years = ['2013', '2015']
     for year in years:
-        # print(f'{year} hosts: {get_hosts(year)}')
+        print(f'{year} hosts: {get_hosts(year)}')
         print("Nominees")
         for award, nominees in get_nominees(year).items():
             print(f'{year} {award} nominees: {nominees}')
-        print("Awards")
+        print("Winners")
         for award, winner in get_winner(year).items():
             print(f'{year} {award} winner: {winner}')
-        print("\n")
-        # print(f'{year} presenters: {get_presenters(year)}')
-        # print(f'{year} award names: {get_awards(year)}')
+        print("Presenters")
+        print(f'{year} presenters: {get_presenters(year)}')
+        print('Award Names')
+        print(f'{year} award names: {get_awards(year)}')
     finish = time.time()
     #print elapsed time in minutes and seconds
     print(f'Elapsed time: {(finish - start) / 60} minutes')

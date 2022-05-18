@@ -76,7 +76,7 @@ def _increment_award_presenter(award_dict, award, name, val):
     else:
         award_dict[award][name] += val
 
-def awards_to_people_parser(award_ppl_dict, and_odds=None):
+def awards_to_people_parser(award_ppl_dict, year, and_odds=None):
     nltk_dict = dict()
     ia = imdb.IMDb()
     result_dict = dict()
@@ -92,7 +92,7 @@ def awards_to_people_parser(award_ppl_dict, and_odds=None):
             val = item[1]
             # perform imdb check and value mutation
 
-            found_name = imdb_api.imdb_get_similar(name, ia, type="person")
+            found_name = imdb_api.imdb_get_similar(name, ia, year, type="person")
             num_nnp = 0
             if found_name == None or found_name == '': continue
 
