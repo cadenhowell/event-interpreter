@@ -129,7 +129,8 @@ dmypy.json
 .pyre/
 
 # json data in base directory and data subdirectory
-/data/*.json
+/data/gg2013.json
+/data/gg2015.json
 /gg-project-master-master/
 
 #VS Code
