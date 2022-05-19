@@ -1,6 +1,7 @@
-from utils import utilities
-import re
 import random
+
+from utils import utilities
+
 
 def analyze_sentiment(host, host_hit_count, host_analysis, t):
     sentiment = utilities.tweet_opinion(t)

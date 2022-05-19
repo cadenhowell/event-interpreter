@@ -1,4 +1,5 @@
 '''Version 0.35'''
+from ast import Str
 import json
 import os.path
 import time
@@ -6,7 +7,8 @@ import time
 import nltk
 
 from interpreters import (awards_interpreter, host_interpreter,
-                          nominee_interpreter, presenter_interpreter, people_sentiment_analyzer)
+                          nominee_interpreter, people_sentiment_analyzer,
+                          presenter_interpreter)
 
 OFFICIAL_AWARDS = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
 
@@ -83,13 +85,40 @@ def pre_ceremony():
     Do NOT change the name of this function or what it returns.'''
     dir = os.path.dirname(__file__) + '/../env/nltk_downloads'
     nltk.data.path.append(dir)
-    nltk.download('punkt', download_dir=dir)
-    nltk.download('stopwords', download_dir=dir)
-    nltk.download('averaged_perceptron_tagger', download_dir=dir)
-    nltk.download('maxent_ne_chunker', download_dir=dir)
-    nltk.download('words', download_dir=dir)
+    nltk_packs = ['punkt', 'stopwords', 'averaged_perceptron_tagger', 'maxent_ne_chunker', 'words', 'vader_lexicon']
+    for pack in nltk_packs:
+        nltk.download(pack, download_dir=dir)
     print("Pre-ceremony processing complete.")
     return
+
+def _dict_print(dictionary):
+    for k, v in dictionary.items():
+        if isinstance(v, str):
+            print(f'{k}\n\t{v}')
+        elif isinstance(v, float):
+            print(f'{k}: {v}')
+        else:
+            print(f'{k}')  
+            for item in v:
+                print(f'\t{item}')
+        print()
+
+def _list_print(list):
+    for item in list:
+        print(f'{item}')
+
+def _print_across(char):
+    term_size = os.get_terminal_size()
+    print(char * term_size.columns)
+
+def _print_result(title, result):
+    print(f'{title}\n')
+    if isinstance(result, dict):       
+        _dict_print(result)
+    else:
+        _list_print(result)
+    _print_across('-')
+
 
 def main():
     '''This function calls your program. Typing "python gg_api.py"
@@ -100,16 +129,17 @@ def main():
     start = time.time()
     pre_ceremony()
     years = ['2013', '2015']
+    titles = ['Hosts', 'Nominees', 'Winners', 'Presenters', 'Award Names', 'Sentiment Analysis of Hosts']
+    functions = [get_hosts, get_nominees, get_winner, get_presenters, get_awards, get_sentiment_comparison]
+    results = {}
     for year in years:
-        hosts = get_hosts(year)
-        print(f'{year} Hosts\n\n{hosts}\n\n')
-        print(f'{year} Nominees\n\n{get_nominees(year)}\n\n')
-        print(f'{year} Winners\n\n{get_winner(year)}\n\n')
-        print(f'{year} Presenters\n\n{get_presenters(year)}\n\n')
-        print(f'{year} Award names\n\n{get_awards(year)}\n\n')
-        print(f'{year} Sentiment Analysis of Hosts\n\n{get_sentiment_comparison(year, hosts)}')
+        print(f'\n\nGolden Globes Analysis for {year}')
+        _print_across('=')
+        for title, f in zip(titles, functions):
+            results[title] = f(year, results['Hosts']) if title == 'Sentiment Analysis of Hosts' else f(year)
+            _print_result(title, results[title])
     finish = time.time()
-    print(f'Elapsed time: {(finish - start) / 60} minutes')
+    print(f'\nElapsed time: {(finish - start) / 60} minutes')
     return
 
 if __name__ == '__main__':
