@@ -1,8 +1,9 @@
 # Event Interpreter (https://github.com/cadenhowell/event-interpreter)
 ## How to Run
-1) Pip install requirements.txt into virtual environment
-2) Enter the src directory
-3) To get human readable output, run: `python gg_api.py`<br>
+1) Add data2013.json and data2015.json into data folder
+2) Pip install requirements.txt into virtual environment
+3) Enter the src directory
+4) To get human readable output, run: `python gg_api.py`<br>
 To get autograder output, run: `python  autograder.py`<br>
     You can supply autograder with the optional flags of either 2013 or 2015 (will run both if not specified) and any number of the following tasks (will run all if none specified).
     - hosts
